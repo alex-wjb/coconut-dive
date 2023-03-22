@@ -1,0 +1,84 @@
+<html>
+  <head></head>
+  <body>
+    <canvas id="canvas" />
+    <img class="coconut" id="coco1" src="./sprites/coconut1.png" />
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      canvas {
+        background: grey;
+        /* height: 100%;
+        width: 100%; */
+        display: block;
+        margin-inline: auto;
+      }
+
+      .coconut {
+        display: none;
+      }
+    </style>
+    <script>
+      window.addEventListener("load", () => {
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = 1000;
+        canvas.height = 900;
+
+        class Player {
+          constructor(game) {
+            this.game = game;
+            this.collisionX = this.game.width * 0.5;
+            this.collisionY = this.game.height * 0.5;
+            this.image = document.getElementById("coco1");
+          }
+          draw(context) {
+            context.drawImage(
+              this.image,
+              this.collisionX - this.image.width / 2,
+              this.collisionY - this.image.height / 2
+            );
+          }
+        }
+
+        class Game {
+          constructor(canvas) {
+            this.canvas = canvas;
+            this.width = this.canvas.width;
+            this.height = this.canvas.height;
+            this.player = new Player(this);
+          }
+          render(context) {
+            this.player.draw(context);
+          }
+        }
+
+        const game = new Game(canvas);
+        game.render(ctx);
+
+        // set initial animation time stamp
+        let lastTime = 0;
+        function animate(timeStamp) {
+          //calculate time between calls of animation function in loop
+          const deltaTime = timeStamp - lastTime;
+          lastTime = timeStamp;
+          console.log(deltaTime);
+
+          //clear canvas
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          game.render(ctx);
+          //creates endless animation loop due to recursion
+          //requestAnimationFrame automatically adjusts itself to screen refresh rate
+          //passes a timestamp parameter into the function it calls each time it is executed.
+          window.requestAnimationFrame(animate(0));
+        }
+        animate();
+      });
+    </script>
+  </body>
+</html>

@@ -34,8 +34,9 @@
           constructor(game) {
             this.game = game;
             this.collisionX = this.game.width * 0.5;
-            this.collisionY = this.game.height * 0.5;
+            this.collisionY = this.game.height * 0.075;
             this.image = document.getElementById("coco1");
+            this.move();
           }
           draw(context) {
             context.drawImage(
@@ -44,6 +45,25 @@
               this.collisionY - this.image.height / 2
             );
           }
+          move() {
+            document.addEventListener("keydown", (event) => {
+              switch (event.key) {
+                case "ArrowUp":
+                  this.collisionY -= 10;
+                  break;
+                case "ArrowDown":
+                  this.collisionY += 10;
+                  break;
+                case "ArrowLeft":
+                  this.collisionX -= 10;
+                  break;
+                case "ArrowRight":
+                  this.collisionX += 10;
+                default:
+                  return;
+              }
+            });
+          }
         }
 
         class Game {
@@ -51,33 +71,41 @@
             this.canvas = canvas;
             this.width = this.canvas.width;
             this.height = this.canvas.height;
+            this.fpsLimit = 20;
             this.player = new Player(this);
+            //calc ms for 1 frame at set fps
+            this.interval = 1000 / this.fpsLimit;
+            this.timer = 0;
           }
-          render(context) {
-            this.player.draw(context);
+          render(context, deltaTime) {
+            if (this.timer >= this.interval) {
+              //clear canvas
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              //draw objects
+              this.player.draw(context);
+              this.timer = 0;
+            }
+            this.timer += deltaTime;
           }
         }
 
         const game = new Game(canvas);
-        game.render(ctx);
 
         // set initial animation time stamp
         let lastTime = 0;
+        //recursive animation function
         function animate(timeStamp) {
-          //calculate time between calls of animation function in loop
+          //calculate time between calls of animate (ms)
           const deltaTime = timeStamp - lastTime;
           lastTime = timeStamp;
-          console.log(deltaTime);
-
-          //clear canvas
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          game.render(ctx);
+          game.render(ctx, deltaTime);
           //creates endless animation loop due to recursion
           //requestAnimationFrame automatically adjusts itself to screen refresh rate
           //passes a timestamp parameter into the function it calls each time it is executed.
-          window.requestAnimationFrame(animate(0));
+          window.requestAnimationFrame(animate);
         }
-        animate();
+        //begin game animation loop
+        animate(0);
       });
     </script>
   </body>

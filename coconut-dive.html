@@ -1,9 +1,11 @@
 <html>
-  <head></head>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
   <body>
     <canvas id="canvas" />
-    <img class="coconut" id="coco1" src="./sprites/coconut1.png" />
-    <img class="ocean" id="ocean" src="./sprites/ocean.png" />
+    <img class="sprite" id="coco1" src="./sprites/coconut1.png" />
+    <img class="sprite" id="seaTile" src="./sprites/SeaTile.png" />
 
     <style>
       html,
@@ -17,147 +19,54 @@
         background: grey;
         /* height: 100%;
         width: 100%; */
+        height: 100vh;
         display: block;
         margin-inline: auto;
       }
 
-      .coconut,
-      .ocean {
+      .sprite {
         display: none;
       }
     </style>
-    <script>
+    <script type="module">
+      import { Game } from "/game.js";
+
+      const drawBackground = (canvas, tileNum) => {
+        const ctx = canvas.getContext("2d");
+        const seaTile = document.getElementById("seaTile");
+        canvas.width = seaTile.width * tileNum;
+        canvas.height = window.innerHeight;
+        let tileRowWidth = 0; 
+        let tileColHeight = 0;
+
+        const pattern = ctx.createPattern(seaTile, "repeat");
+        ctx.fillStyle = pattern;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      };
+
       window.addEventListener("load", () => {
+        //setup canvas
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
+        //TODO: may only need to set in css
 
-        canvas.width = 1000;
-        canvas.height = 900;
+        // ctx.drawImage(document.getElementById("ocean"), 0, 0);
+        drawBackground(canvas, 10);
 
-        ctx.drawImage(document.getElementById("ocean"), 0, 0);
-
-        class Player {
-          constructor(game) {
-            this.game = game;
-            this.collisionX = this.game.width * 0.5;
-            this.collisionY = this.game.height * 0.075;
-            this.speedX = 0;
-            this.speedY = 0;
-            this.image = document.getElementById("coco1");
-            this.keyListener();
-            this.move = {
-              up: false,
-              down: false,
-              left: false,
-              right: false,
-            };
-          }
-          update() {
-            this.speedX = this.speedX * 0.9;
-            this.speedY = this.speedY * 0.9;
-            this.collisionX = this.collisionX + this.speedX;
-            this.collisionY = this.collisionY + this.speedY;
-            if (this.move.up) {
-              this.speedY = this.speedY - 0.75;
-              // this.collisionY = this.collisionY - 10;
-            }
-            if (this.move.down) {
-              this.speedY = this.speedY + 0.75;
-              // this.collisionY = this.collisionY + 10;
-            }
-            if (this.move.left) {
-              this.speedX = this.speedX - 0.75;
-              // this.collisionX = this.collisionX - 10;
-            }
-            if (this.move.right) {
-              this.speedX = this.speedX + 0.75;
-              // this.collisionX = this.collisionX + 10;
-            }
-          }
-          draw(context) {
-            context.drawImage(
-              this.image,
-              Math.round(this.collisionX - this.image.width / 2),
-              Math.round(this.collisionY - this.image.height / 2)
-            );
-
-            console.log(Math.round(this.collisionX - this.image.width / 2));
-          }
-          keyListener() {
-            document.addEventListener("keydown", (event) => {
-              switch (event.key) {
-                case "ArrowUp":
-                  this.move.up = true;
-                  break;
-                case "ArrowDown":
-                  this.move.down = true;
-                  break;
-                case "ArrowLeft":
-                  this.move.left = true;
-                  break;
-                case "ArrowRight":
-                  this.move.right = true;
-                default:
-                  return;
-              }
-            });
-
-            document.addEventListener("keyup", (event) => {
-              switch (event.key) {
-                case "ArrowUp":
-                  this.move.up = false;
-                  break;
-                case "ArrowDown":
-                  this.move.down = false;
-                  break;
-                case "ArrowLeft":
-                  this.move.left = false;
-                  break;
-                case "ArrowRight":
-                  this.move.right = false;
-                default:
-                  return;
-              }
-            });
-          }
-        }
-
-        class Game {
-          constructor(canvas) {
-            this.canvas = canvas;
-            this.width = this.canvas.width;
-            this.height = this.canvas.height;
-            this.fpsLimit = 70;
-            this.player = new Player(this);
-            //calc ms for 1 frame at set fps
-            this.interval = 1000 / this.fpsLimit;
-            this.timer = 0;
-          }
-          render(context, deltaTime) {
-            if (this.timer > this.interval) {
-              //clear canvas
-              ctx.clearRect(0, 0, this.width, this.height);
-              //draw objects
-              ctx.drawImage(document.getElementById("ocean"), 0, 0);
-              this.player.draw(context);
-              this.player.update();
-
-              this.timer = 0;
-            }
-            this.timer += deltaTime;
-          }
-        }
-
+        //create game object
         const game = new Game(canvas);
 
-        // set initial animation time stamp
+        //set initial animation time stamp
         let lastTime = 0;
         //recursive animation function
         function animate(timeStamp) {
           //calculate time between calls of animate (ms)
-          const deltaTime = timeStamp - lastTime;
+
+          const deltaAnimateTime = timeStamp - lastTime;
           lastTime = timeStamp;
-          game.render(ctx, deltaTime);
+        
+          game.render(ctx, deltaAnimateTime);
+          
           //creates endless animation loop due to recursion
           //requestAnimationFrame automatically adjusts itself to screen refresh rate
           //passes a timestamp parameter into the function it calls each time it is executed.

@@ -3,9 +3,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
   <body>
-    <canvas id="canvas" />
+    <canvas id="gameCanvas"> </canvas>
     <img class="sprite" id="coco1" src="./sprites/coconut1.png" />
-    <img class="sprite" id="seaTile" src="./sprites/SeaTile.png" />
+    <img class="sprite" id="seaTileSprite" src="./sprites/SeaTile.png" />
 
     <style>
       html,
@@ -28,30 +28,18 @@
         display: none;
       }
     </style>
-    <script type="module">
+    <script type="module"> //use strict by default
+   
       import { Game } from "/game.js";
-
-      const drawBackground = (canvas, tileNum) => {
-        const ctx = canvas.getContext("2d");
-        const seaTile = document.getElementById("seaTile");
-        canvas.width = seaTile.width * tileNum;
-        canvas.height = window.innerHeight;
-        let tileRowWidth = 0; 
-        let tileColHeight = 0;
-
-        const pattern = ctx.createPattern(seaTile, "repeat");
-        ctx.fillStyle = pattern;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-      };
 
       window.addEventListener("load", () => {
         //setup canvas
-        const canvas = document.getElementById("canvas");
+        const canvas = document.getElementById("gameCanvas") ;
+        const tileNum = 11;
+        const seaTile = document.getElementById("seaTileSprite");
+        canvas.width = seaTile.width * tileNum;
+        canvas.height = window.innerHeight;
         const ctx = canvas.getContext("2d");
-        //TODO: may only need to set in css
-
-        // ctx.drawImage(document.getElementById("ocean"), 0, 0);
-        drawBackground(canvas, 10);
 
         //create game object
         const game = new Game(canvas);
@@ -61,12 +49,11 @@
         //recursive animation function
         function animate(timeStamp) {
           //calculate time between calls of animate (ms)
-
           const deltaAnimateTime = timeStamp - lastTime;
           lastTime = timeStamp;
-        
+
           game.render(ctx, deltaAnimateTime);
-          
+
           //creates endless animation loop due to recursion
           //requestAnimationFrame automatically adjusts itself to screen refresh rate
           //passes a timestamp parameter into the function it calls each time it is executed.
@@ -75,6 +62,7 @@
         //begin game animation loop
         animate(0);
       });
+
     </script>
   </body>
 </html>

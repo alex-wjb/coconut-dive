@@ -1,32 +1,30 @@
 export class Player {
+  image = document.getElementById("coco1");
+  velocityX = 0;
+  velocityY = 0;
+  accelerationX = 0;
+  accelerationY = 0;
+  friction = 0.9;
+  move = {
+    up: false,
+    down: false,
+    left: false,
+    right: false,
+    floatUp: false,
+  };
   constructor(game) {
     this.game = game;
-    this.collisionX = this.game.width * 0.5;
-    this.collisionY = this.game.height * 0.075;
-    this.boundaryY = 100;
-    this.x = this.game.width * 0.5;
-    this.y = this.boundaryY;
-    this.velocityX = 0;
-    this.velocityY = 0;
-    this.image = document.getElementById("coco1");
-
+    //set player boundaries
     this.boundaryXLeft = 150;
     this.boundaryXRight = this.game.width - 150;
-    this.accelerationX = 0;
-    this.accelerationY = 0;
-    this.friction = 0.9;
-    this.keyListener(); //needs to be before move obj declaration (Refactor)
-    this.move = {
-      up: false,
-      down: false,
-      left: false,
-      right: false,
-      floatUp: false,
-    };
-
-    this.movePlayer();
+    this.boundaryY = 100;
+    //set player starting co-ords
+    this.x = this.game.width * 0.5;
+    this.y = this.boundaryY;
+    this.#keyListener();
+    this.#movePlayer();
   }
-  movePlayer() {
+  #movePlayer() {
     //calculate final velocity
     this.velocityX += this.accelerationX;
     this.velocityY += this.accelerationY;
@@ -48,7 +46,7 @@ export class Player {
     }
   }
   update() {
-    this.movePlayer();
+    this.#movePlayer();
 
     if (this.move.down && this.y < this.game.height - this.boundaryY - 100) {
       this.move.floatUp = false;
@@ -73,7 +71,6 @@ export class Player {
       this.accelerationX = 0;
     }
 
-
     //MORE FUN?
     //works if add bouncing off walls feature
     // if (this.move.left && this.x > this.boundaryXLeft) {
@@ -94,7 +91,7 @@ export class Player {
     );
   }
 
-  keyListener() {
+  #keyListener() {
     document.addEventListener("keydown", (event) => {
       switch (event.key) {
         case "ArrowDown":

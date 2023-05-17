@@ -1,3 +1,4 @@
+//TODO: close event listeners after use?
 export class Player {
   image = document.getElementById("coco1");
   velocityX = 0;
@@ -16,9 +17,11 @@ export class Player {
   constructor(game) {
     this.game = game;
     //set player boundaries
-    this.boundaryXLeft = this.game.width/6;
-    this.boundaryXRight = this.game.width - this.game.width/6;
+    this.boundaryXLeft = this.game.width / 6;
+    this.boundaryXRight = this.game.width - this.game.width / 6;
     this.boundaryY = 100;
+    this.touchX = "";
+    this.touchY = "";
 
     //set player starting co-ords
     this.x = 0;
@@ -26,6 +29,7 @@ export class Player {
     this.startX = null;
     this.y = this.boundaryY;
     this.#keyListener();
+    this.#touchListener();
     this.#movePlayer();
   }
   #movePlayer() {
@@ -51,11 +55,15 @@ export class Player {
   }
   update(ctx) {
     this.#movePlayer();
-    this.boundaryXLeft = (ctx.canvas.width / 6) < 100 ? 100 : ctx.canvas.width /6  ;
-    this.boundaryXRight = (ctx.canvas.width - ctx.canvas.width / 6) > ctx.canvas.width - 100 ? ctx.canvas.width - 100 : (ctx.canvas.width - ctx.canvas.width / 6) ;
+    this.boundaryXLeft =
+      ctx.canvas.width / 6 < 100 ? 100 : ctx.canvas.width / 6;
+    this.boundaryXRight =
+      ctx.canvas.width - ctx.canvas.width / 6 > ctx.canvas.width - 100
+        ? ctx.canvas.width - 100
+        : ctx.canvas.width - ctx.canvas.width / 6;
     // console.log(this.boundaryXRight);
     console.log(this.boundaryXLeft);
-    this.friction = 0.9;   
+    this.friction = 0.9;
 
     if (this.move.down && this.y < this.game.height - this.boundaryY - 100) {
       this.move.floatUp = false;
@@ -73,9 +81,9 @@ export class Player {
 
     //ORGINAL MOVEMENT
     // console.log(this.currentX);
-    if (this.move.left && (this.currentX > this.boundaryXLeft)) {
+    if (this.move.left && this.currentX > this.boundaryXLeft) {
       this.accelerationX = -1.5;
-    } else if (this.move.right && (this.currentX < this.boundaryXRight)) {
+    } else if (this.move.right && this.currentX < this.boundaryXRight) {
       this.accelerationX = 1.5;
     } else {
       this.accelerationX = 0;
@@ -94,8 +102,6 @@ export class Player {
     if (this.currentX > this.boundaryXRight && this.move.left) {
       this.frictionX = 0.9;
     }
-    
-    
 
     //MORE FUN?
     //works if add bouncing off walls feature
@@ -110,7 +116,7 @@ export class Player {
     // }
   }
   draw(ctx) {
-    console.log(ctx.canvas.width)
+    console.log(ctx.canvas.width);
     // console.log(this.game.width);
     // this.boundaryXRight = ctx.canvas.width - 200;
 
@@ -127,19 +133,18 @@ export class Player {
     this.boundaryXRight = ctx.canvas.width - ctx.canvas.width * 0.4;
     // console.log(ctx.canvas.width * 0.4);
     // console.log(ctx.canvas.width * 0.4);
-  
+
     //initialise starting x co-ord
     // this.startX = ctx.canvas.width * 0.5;
     // this.currentX = (this.startX + this.x) + imageWidth / 2;
 
-    this.startX = (ctx.canvas.width * 0.5);
-    this.currentX = (this.startX + this.x);
+    this.startX = ctx.canvas.width * 0.5;
+    this.currentX = this.startX + this.x;
 
     ctx.drawImage(
       this.image,
       // Math.round(this.x - this.image.width / 2),
-      Math.round((this.startX + this.x)  - imageWidth / 2),
-
+      Math.round(this.startX + this.x - imageWidth / 2),
 
       Math.round(this.y - imageHeight / 2),
       imageWidth,
@@ -181,6 +186,61 @@ export class Player {
         default:
           return;
       }
+    });
+  }
+
+  #touchListener() {
+    document.addEventListener("touchStart", (event) => {
+      event.preventDefault();
+      //could use pageX or screenX
+      const touchX = event.touches[0].clientX;
+      const touchY = event.touches[0].clientY;
+    });
+
+    document.addEventListener("touchstart", (event) => {
+      event.preventDefault();
+      //could use pageX or screenX
+      this.touchX = event.touches[0].clientX;
+      this.touchY = event.touches[0].clientY;
+      if (this.touchX > this.currentX) {
+        this.move.left = false;
+        this.move.right = true;
+      } else {
+        this.move.right = false;
+        this.move.left = true;
+      }
+
+      if (this.touchY > this.currentY) {
+        this.move.down = true;
+      } else {
+        this.move.down = false;
+      }
+    });
+
+    document.addEventListener("touchmove", (event) => {
+      event.preventDefault();
+      //   //could use pageX or screenX
+      this.touchX = event.touches[0].clientX;
+      this.touchY = event.touches[0].clientY;
+      if (this.touchX > this.currentX) {
+        this.move.left = false;
+        this.move.right = true;
+      } else {
+        this.move.right = false;
+        this.move.left = true;
+      }
+
+      if (this.touchY > this.y) {
+        this.move.down = true;
+      }
+    });
+
+    document.addEventListener("touchend", (event) => {
+      event.preventDefault();
+      //could use pageX or screenX
+      this.move.right = false;
+      this.move.left = false;
+      this.move.down = false;
     });
   }
 }

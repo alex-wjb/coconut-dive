@@ -1,6 +1,6 @@
 <html>
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
   </head>
   <body>
     <canvas id="gameCanvas"> </canvas>
@@ -13,15 +13,25 @@
         margin: 0;
         padding: 0;
         background: black;
+   
       }
 
       canvas {
         background: grey;
         /* height: 100%;
-        width: 100%; */
-        height: 100vh;
+        /* height: 100vh; */
         display: block;
+        /* max-width: 600px; */
+        /* min-height: 100%; */
+        /* width: 100%; */
+        /* max-height: 100%;
+        min-height: 100%; */
+        /* max-height: 100vh; */
+        height: 100%;
+        width: 100%;
+        max-width: 800px;
         margin-inline: auto;
+      
       }
 
       .sprite {
@@ -37,12 +47,19 @@
         const canvas = document.getElementById("gameCanvas") ;
         const tileNum = 11;
         const seaTile = document.getElementById("seaTileSprite");
-        canvas.width = seaTile.width * tileNum;
+        // canvas.width = seaTile.width * tileNum;
+        canvas.width = 600;
+        canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
+        console.log( window.innerHeight);
+        console.log( canvas.scrollHeight);
+        console.log(canvas.width);
+        console.log(canvas.scrollWidth);
+
         const ctx = canvas.getContext("2d");
 
         //create game object
-        const game = new Game(canvas);
+        const game = new Game(canvas, ctx);
 
         //set initial animation time stamp
         let lastTime = 0;

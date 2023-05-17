@@ -16,6 +16,13 @@ export class Game {
   //INSTANCE METHODS
   #drawBackground(ctx) {
     //create scrolling background
+    this.canvas.height = window.innerHeight;
+    ctx.canvas.height = window.innerHeight;
+    this.canvas.width = window.innerWidth;
+    ctx.canvas.width = window.innerWidth;
+    if (this.canvas.width >= 800) {
+      this.canvas.width = 800;
+    }
 
     const seaTile = document.getElementById("seaTileSprite");
     const pattern = ctx.createPattern(seaTile, "repeat");
@@ -48,7 +55,7 @@ export class Game {
 
       //draw objects
       this.player.draw(ctx);
-      this.player.update();
+      this.player.update(ctx);
       this.timer = 0;
     }
     this.timer += deltaAnimateTime;

@@ -210,7 +210,7 @@ export class Player {
         this.move.left = true;
       }
 
-      if (this.touchY > this.currentY) {
+      if (this.touchY > this.y) {
         this.move.down = true;
       } else {
         this.move.down = false;

@@ -20,8 +20,10 @@ export class Player {
     this.boundaryXLeft = this.game.width / 6;
     this.boundaryXRight = this.game.width - this.game.width / 6;
     this.boundaryY = 100;
-    this.touchX = "";
+    this.touchX = null;
     this.touchY = "";
+    this.moved = false;
+    this.bottomBoundaryY = 200;
 
     //set player starting co-ords
     this.x = 0;
@@ -54,6 +56,67 @@ export class Player {
     }
   }
   update(ctx) {
+
+        //TOUCH MOVEMENT
+        if (this.touchX) { 
+          if (this.touchX > this.currentX) {
+            this.move.left = false;
+            this.move.right = true;
+          } 
+          if(this.touchX < this.currentX){
+            this.move.right = false;
+            this.move.left = true;
+          }
+          }
+          console.log(this.touchX);
+          console.log(this.currentX);
+          
+          if (this.touchX <= this.currentX + 30 && this.touchX >= this.currentX - 30) {
+            this.currentX = this.touchX;
+            this.move.right = false;
+            this.move.left = false;
+            //slow down player
+            this.accelerationX = 0;
+            this.velocityX = this.velocityX*0.8;
+          }
+        
+    // if (this.touchX) {
+        
+    //   if (this.touchX < this.currentX && !this.moved) {
+    //     this.move.right = false;
+    //     this.move.left = true;
+    //     this.moved = true;
+    //   }
+    
+     
+    //   if (this.touchX > this.currentX && !this.moved) {
+    //     this.move.right = true;
+    //     this.move.left = false;
+    //     this.moved = true;
+    //   }
+
+    //   if (this.touchX < this.currentX ) {
+      
+    //     this.move.right = false;
+       
+    //   }
+
+    //   if (this.touchX > this.currentX) {
+      
+    //     this.move.left = false;
+       
+    //   }
+    
+     
+    //   if (this.touchX > this.currentX && !this.moved) {
+    //     this.move.right = true;
+    //     this.move.left = false;
+    //     this.moved = true;
+    //   }
+    // }
+ 
+
+
     this.#movePlayer();
     this.boundaryXLeft =
       ctx.canvas.width / 6 < 100 ? 100 : ctx.canvas.width / 6;
@@ -65,7 +128,13 @@ export class Player {
     console.log(this.boundaryXLeft);
     this.friction = 0.9;
 
-    if (this.move.down && this.y < this.game.height - this.boundaryY - 100) {
+
+
+
+
+
+
+    if (this.move.down && this.y < ctx.canvas.height - this.bottomBoundaryY) {
       this.move.floatUp = false;
       this.accelerationY = 1.5;
     } else {
@@ -131,6 +200,11 @@ export class Player {
     // this.boundaryXLeft = ctx.canvas.width * 0.4
 
     this.boundaryXRight = ctx.canvas.width - ctx.canvas.width * 0.4;
+
+   
+    if (ctx.canvas.width < 450) {
+      this.bottomBoundaryY = 250;
+    }
     // console.log(ctx.canvas.width * 0.4);
     // console.log(ctx.canvas.width * 0.4);
 
@@ -139,7 +213,8 @@ export class Player {
     // this.currentX = (this.startX + this.x) + imageWidth / 2;
 
     this.startX = ctx.canvas.width * 0.5;
-    this.currentX = this.startX + this.x;
+    this.currentX = Math.round(this.startX + this.x);
+ 
 
     ctx.drawImage(
       this.image,
@@ -190,25 +265,31 @@ export class Player {
   }
 
   #touchListener() {
-    document.addEventListener("touchStart", (event) => {
-      event.preventDefault();
-      //could use pageX or screenX
-      const touchX = event.touches[0].clientX;
-      const touchY = event.touches[0].clientY;
-    });
+    // document.addEventListener("touchStart", (event) => {
+    //   event.preventDefault();
+    //   //could use pageX or screenX
+    //   const touchX = event.touches[0].clientX;
+    //   const touchY = event.touches[0].clientY;
+    // });
 
     document.addEventListener("touchstart", (event) => {
       event.preventDefault();
       //could use pageX or screenX
-      this.touchX = event.touches[0].clientX;
-      this.touchY = event.touches[0].clientY;
-      if (this.touchX > this.currentX) {
-        this.move.left = false;
-        this.move.right = true;
-      } else {
-        this.move.right = false;
-        this.move.left = true;
-      }
+      this.touchX = Math.round(event.touches[0].clientX);
+      this.touchY = Math.round(event.touches[0].clientY);
+      // if (this.touchX > this.currentX) {
+      //   this.move.left = false;
+      //   this.move.right = true;
+      // } else {
+      //   this.move.right = false;
+      //   this.move.left = true;
+      // }
+
+      // if (this.touchX === this.currentX) {
+      //   this.move.right = false;
+      //   this.move.left = false;
+
+      // }
 
       if (this.touchY > this.y) {
         this.move.down = true;
@@ -219,16 +300,17 @@ export class Player {
 
     document.addEventListener("touchmove", (event) => {
       event.preventDefault();
+      this.moved = false;
       //   //could use pageX or screenX
-      this.touchX = event.touches[0].clientX;
-      this.touchY = event.touches[0].clientY;
-      if (this.touchX > this.currentX) {
-        this.move.left = false;
-        this.move.right = true;
-      } else {
-        this.move.right = false;
-        this.move.left = true;
-      }
+      this.touchX = Math.round(event.touches[0].clientX);
+      this.touchY = Math.round(event.touches[0].clientY);
+      // if (this.touchX > this.currentX) {
+      //   this.move.left = false;
+      //   this.move.right = true;
+      // } else {
+      //   this.move.right = false;
+      //   this.move.left = true;
+      // }
 
       if (this.touchY > this.y) {
         this.move.down = true;
